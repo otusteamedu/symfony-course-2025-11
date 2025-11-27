@@ -4,4 +4,3 @@
 
 Авторы:
 - [Михаил Каморин](mailto:m.v.kamorin@gmail.com)
-- [Сергей Петров](mailto:cl@coders-lair.com)
