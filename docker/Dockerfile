@@ -63,7 +63,6 @@ RUN pecl channel-update pecl.php.net \
 #    && apk del .build-dependencies
 
 # Symfony installer
-#COPY --link \
-#    --from=ghcr.io/symfony-cli/symfony-cli:latest \
-#    /usr/local/bin/symfony /usr/local/bin/symfony
-
+COPY --link \
+   --from=ghcr.io/symfony-cli/symfony-cli:latest \
+   /usr/local/bin/symfony /usr/local/bin/symfony

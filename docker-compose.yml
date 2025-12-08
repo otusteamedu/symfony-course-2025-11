@@ -2,16 +2,16 @@ services:
 
   php-fpm:
     build: docker
-    container_name: 'php'
+    container_name: 'php-11'
     ports:
-      - '9000:9000'
+      - '8000:8000'
     volumes:
       - ./:/app
     working_dir: /app
 
   nginx:
     image: nginx
-    container_name: 'nginx'
+    container_name: 'nginx-11'
     working_dir: /app
     ports:
       - '7777:80'

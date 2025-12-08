@@ -1,42 +1,15 @@
 # Установка и "Hello, world"
 
-## Устанавливаем Symfony
-1. Инициализируем проект командой `composer create-project symfony/skeleton otus_project "7.3.*"`
+## Устанавливаем Symfony (локально)
+1. Инициализируем проект командой `composer create-project symfony/skeleton otus_project "7.3.*"` (при разворачивании сразу в Docker - шаг можно пропустить)
 2. Добавляем в .gitignore служебный каталог PhpStorm
     ```gitignore
     .idea/*
     ```
+3. Выполняем команду `symfony serve  --no-tls --allow-all-ip`
+4. Заходим по адресу `http://127.0.0.1:8000`, видим приветственную страницу Symfony
 
-## Добавляем WorldController с экшеном hello
-
-1. Создаём класс `App\Controller\WorldController`
-    ```php
-    <?php
-
-    namespace App\Controller;
-
-    use Symfony\Component\HttpFoundation\Response;
-
-    class WorldController
-    {
-        public function hello(): Response
-        {
-            return new Response('<html><body><h1><b>Hello,</b> <i>world</i>!</h1></body></html>');
-        }
-    }
-    ```
-2. В файле `config/routes.yaml` добавляем описание endpoint'а
-    ```yaml
-    hello_world:
-        path: /world/hello
-        controller: App\Controller\WorldController::hello
-    ```
-3. Выполняем команду `symfony serve`
-4. Заходим по адресу `http://localhost:8000`, видим приветственную страницу Symfony
-5. Заходим по адресу `http://localhost:8000/world/hello`, видим результат работы нашего контроллера
-
-## Добавляем Docker
-
+## Устанавливаем Symfony (Docker)
 1. Создаём файл `docker-compose.yml`
     ```yaml    
     services:
@@ -45,58 +18,14 @@
         build: docker
         container_name: 'php'
         ports:
-          - '9000:9000'
+          - '8000:8000'
         volumes:
           - ./:/app
         working_dir: /app
-    
-      nginx:
-        image: nginx
-        container_name: 'nginx'
-        working_dir: /app
-        ports:
-          - '7777:80'
-        volumes:
-          - ./:/app
-          - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
     ```
-2. Создаём файл `docker\nginx.conf`
-    ```
-    server {
-        listen 80;
-     
-        server_name localhost;
-        error_log  /var/log/nginx/error.log;
-        access_log /var/log/nginx/access.log;
-        root /app/public;
-     
-        rewrite ^/index\.php/?(.*)$ /$1 permanent;
-     
-        try_files $uri @rewriteapp;
-     
-        location @rewriteapp {
-            rewrite ^(.*)$ /index.php/$1 last;
-        }
-     
-        # Deny all . files
-        location ~ /\. {
-            deny all;
-        }
-     
-        location ~ ^/index\.php(/|$) {
-            fastcgi_split_path_info ^(.+\.php)(/.*)$;
-            include fastcgi_params;
-            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-            fastcgi_param PATH_INFO $fastcgi_path_info;
-            fastcgi_index index.php;
-            send_timeout 1800;
-            fastcgi_read_timeout 1800;
-            fastcgi_pass php:9000;
-        }
-    }
-    ```
-3. Создаём файл `docker\Dockerfile`
-   ```dockerfile
+
+2. Создаём файл `docker\Dockerfile`
+   ```Dockerfile
    FROM php:8.3-fpm-alpine
    
    # Install dev dependencies
@@ -162,9 +91,93 @@
    #    && apk del .build-dependencies
    
    # Symfony installer
-   #COPY --link \
-   #    --from=ghcr.io/symfony-cli/symfony-cli:latest \
-   #    /usr/local/bin/symfony /usr/local/bin/symfony
+   COPY --link \
+       --from=ghcr.io/symfony-cli/symfony-cli:latest \
+       /usr/local/bin/symfony /usr/local/bin/symfony
    ```
-4. Запускаем контейнеры командой `docker-compose up -d`
-5. Заходим по адресу `http://localhost:7777/world/hello`, видим результат работы нашего контроллера
+3. Запускаем контейнер командой `docker-compose up -d`
+4. Заходим в контейнер `docker compose exec -it php-fpm bash`
+5. Инициализируем проект командой `composer create-project symfony/skeleton otus_project "7.3.*"`
+6. Перемещаем файлы в текущую дирректорию `mv otus_project/{.*,*} ./ && rm -rf otus_project && chmod -R 0777 config/ src/ var/`
+
+## Добавляем WorldController с экшеном hello
+
+1. Создаём класс `src/Controller/WorldController.php`
+    ```php
+    <?php
+
+    namespace App\Controller;
+
+    use Symfony\Component\HttpFoundation\Response;
+
+    class WorldController
+    {
+        public function hello(): Response
+        {
+            return new Response('<html><body><h1><b>Hello,</b> <i>world</i>!</h1></body></html>');
+        }
+    }
+    ```
+2. В файле `config/routes.yaml` добавляем описание endpoint'а
+    ```yaml
+    hello_world:
+        path: /world/hello
+        controller: App\Controller\WorldController::hello
+    ```
+3. Выполняем команду `symfony serve  --no-tls --allow-all-ip`
+4. Заходим по адресу `http://127.0.0.1:8000`, видим приветственную страницу Symfony
+5. Заходим по адресу `http://127.0.0.1:8000/world/hello`, видим результат работы нашего контроллера
+
+## Добавляем Nginx
+
+1. В файл `docker-compose.yml` добавляем nginx
+    ```yaml    
+    services:
+    
+      nginx:
+        image: nginx
+        container_name: 'nginx-11'
+        working_dir: /app
+        ports:
+          - '7777:80'
+        volumes:
+          - ./:/app
+          - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    ```
+2. Создаём файл `docker\nginx.conf`
+    ```nginx
+    server {
+        listen 80;
+     
+        server_name localhost;
+        error_log  /var/log/nginx/error.log;
+        access_log /var/log/nginx/access.log;
+        root /app/public;
+     
+        rewrite ^/index\.php/?(.*)$ /$1 permanent;
+     
+        try_files $uri @rewriteapp;
+     
+        location @rewriteapp {
+            rewrite ^(.*)$ /index.php/$1 last;
+        }
+     
+        # Deny all . files
+        location ~ /\. {
+            deny all;
+        }
+     
+        location ~ ^/index\.php(/|$) {
+            fastcgi_split_path_info ^(.+\.php)(/.*)$;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_param PATH_INFO $fastcgi_path_info;
+            fastcgi_index index.php;
+            send_timeout 1800;
+            fastcgi_read_timeout 1800;
+            fastcgi_pass php:9000;
+        }
+    }
+    ```
+3. Запускаем контейнер командой `docker-compose up -d`
+4. Заходим по адресу `http://localhost:7777/world/hello`, видим результат работы нашего контроллера
