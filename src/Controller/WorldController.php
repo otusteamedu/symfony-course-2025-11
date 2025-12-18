@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\Domain\Entity\User;
 use App\Domain\Service\UserService;
-use App\Domain\Service\UserBuilderService;
-use Doctrine\ORM\NonUniqueResultException;
+use DateInterval;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -12,21 +12,17 @@ class WorldController extends AbstractController
 {
     public function __construct(
         private readonly UserService $userService,
-        private readonly UserBuilderService $userBuilderService,
     ) {
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
     public function hello(): Response
     {
-        $user = $this->userBuilderService->createUserWithTweets(
-            'Charles Dickens',
-            ['Oliver Twist', 'The Christmas Carol']
-        );
-        $userData = $this->userService->findUserWithTweetsWithDBALQueryBuilder($user->getId());
+        $this->userService->createWithPhone('Phone user', '+1234567890');
+        $this->userService->createWithEmail('Email user', 'my@mail.ru');
+        $users = $this->userService->findUsersByLoginWithQueryBuilder('user');
 
-        return $this->json($userData);
+        return $this->json(
+            ['users' => array_map(static fn (User $user) => $user->toArray(), $users)]
+        );
     }
 }

@@ -2,8 +2,11 @@
 
 namespace App\Domain\Service;
 
+use App\Domain\Entity\EmailUser;
+use App\Domain\Entity\PhoneUser;
 use App\Domain\Entity\User;
 use App\Infrastructure\Repository\UserRepository;
+use DateInterval;
 
 class UserService
 {
@@ -11,18 +14,24 @@ class UserService
     {
     }
 
-    public function create(string $login): User
+    public function createWithPhone(string $login, string $phone): User
     {
-        $user = new User();
+        $user = new PhoneUser();
         $user->setLogin($login);
+        $user->setPhone($phone);
         $this->userRepository->create($user);
 
         return $user;
     }
 
-    public function refresh(User $user): void
+    public function createWithEmail(string $login, string $email): User
     {
-        $this->userRepository->refresh($user);
+        $user = new EmailUser();
+        $user->setLogin($login);
+        $user->setEmail($email);
+        $this->userRepository->create($user);
+
+        return $user;
     }
 
     public function subscribeUser(User $author, User $follower): void
@@ -74,6 +83,11 @@ class UserService
         return $user;
     }
 
+    public function refresh(User $user): void
+    {
+        $this->userRepository->refresh($user);
+    }
+
     public function updateUserLoginWithDBALQueryBuilder(int $userId, string $login): ?User
     {
         $user = $this->userRepository->find($userId);
@@ -94,5 +108,29 @@ class UserService
     public function findUserWithTweetsWithDBALQueryBuilder(int $userId): array
     {
         return $this->userRepository->findUserWithTweetsWithDBALQueryBuilder($userId);
+    }
+
+    public function removeById(int $userId): void
+    {
+        $user = $this->userRepository->find($userId);
+        if ($user instanceof User) {
+            $this->userRepository->remove($user);
+        }
+    }
+
+    public function removeByIdInFuture(int $userId, DateInterval $dateInterval): void
+    {
+        $user = $this->userRepository->find($userId);
+        if ($user instanceof User) {
+            $this->userRepository->removeInFuture($user, $dateInterval);
+        }
+    }
+
+    /**
+     * @return User[]
+     */
+    public function findUsersByLoginWithDeleted(string $login): array
+    {
+        return $this->userRepository->findUsersByLoginWithDeleted($login);
     }
 }
