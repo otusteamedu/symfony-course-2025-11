@@ -58,6 +58,9 @@ class User implements EntityInterface, HasMetaTimestampsInterface, SoftDeletable
     #[ORM\Column(name: 'deleted_at', type: 'datetime', nullable: true)]
     private ?DateTime $deletedAt = null;
 
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $avatarLink = null;
+
     public function __construct()
     {
         $this->tweets = new ArrayCollection();
@@ -159,11 +162,22 @@ class User implements EntityInterface, HasMetaTimestampsInterface, SoftDeletable
         }
     }
 
+    public function getAvatarLink(): ?string
+    {
+        return $this->avatarLink;
+    }
+
+    public function setAvatarLink(?string $avatarLink): void
+    {
+        $this->avatarLink = $avatarLink;
+    }
+
     public function toArray(): array
     {
         return [
             'id' => $this->id,
             'login' => $this->login,
+            'avatar' => $this->avatarLink,
             'createdAt' => $this->createdAt->format('Y-m-d H:i:s'),
             'updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'),
             'tweets' => array_map(static fn(Tweet $tweet) => $tweet->toArray(), $this->tweets->toArray()),
