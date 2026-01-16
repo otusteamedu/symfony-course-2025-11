@@ -23,9 +23,17 @@ class UserService
             CommunicationChannelEnum::Phone => (new PhoneUser())->setPhone($createUserModel->communicationMethod),
         };
         $user->setLogin($createUserModel->login);
+        $user->setPassword($createUserModel->password);
+        $user->setAge($createUserModel->age);
+        $user->setIsActive($createUserModel->isActive);
         $this->userRepository->create($user);
 
         return $user;
+    }
+
+    public function processFromForm(User $user): void
+    {
+        $this->userRepository->create($user);
     }
 
     public function createWithPhone(string $login, string $phone): User
