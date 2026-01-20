@@ -3,6 +3,13 @@
         <tr>
             <td>{{ user.id|my_twice }}</td>
             <td>{{ user.login }}</td>
+            <td>
+                <ul>
+                    {% for role in user.roles %}
+                        <li>{{ role }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
             <td>{{ user.communicationChannel }}</td>
             <td>({{ user.communicationMethod }})</td>
         </tr>
