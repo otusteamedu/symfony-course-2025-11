@@ -36,6 +36,36 @@ class UserService
         return $user;
     }
 
+    public function findUserByLogin(string $login): ?User
+    {
+        $users = $this->userRepository->findUsersByLogin($login);
+
+        return $users[0] ?? null;
+    }
+
+    public function updateUserToken(string $login): ?string
+    {
+        $user = $this->findUserByLogin($login);
+        if ($user === null) {
+            return null;
+        }
+
+        return $this->userRepository->updateUserToken($user);
+    }
+
+    public function findUserByToken(string $token): ?User
+    {
+        return $this->userRepository->findUserByToken($token);
+    }
+
+    public function clearUserToken(string $login): void
+    {
+        $user = $this->findUserByLogin($login);
+        if ($user !== null) {
+            $this->userRepository->clearUserToken($user);
+        }
+    }
+
     public function processFromForm(User $user): void
     {
         $this->userRepository->create($user);

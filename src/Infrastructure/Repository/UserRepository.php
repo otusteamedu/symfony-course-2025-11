@@ -18,6 +18,29 @@ class UserRepository extends AbstractRepository
         return $this->store($user);
     }
 
+    public function updateUserToken(User $user): string
+    {
+        $token = base64_encode(random_bytes(20));
+        $user->setToken($token);
+        $this->flush();
+
+        return $token;
+    }
+
+    public function findUserByToken(string $token): ?User
+    {
+        /** @var User|null $user */
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['token' => $token]);
+
+        return $user;
+    }
+
+    public function clearUserToken(User $user): void
+    {
+        $user->setToken(null);
+        $this->flush();
+    }
+
     public function subscribeUser(User $author, User $follower): void
     {
         $author->addFollower($follower);
