@@ -277,7 +277,7 @@
         return $this->jwtEncoder->encode($tokenData);
     }
     ```
-3. В файле `config/api-platform.yaml` добавляем секцию `swagger`
+3. В файле `config/packages/api-platform.yaml` добавляем секцию `swagger`
     ```yaml
     swagger:
         api_keys:
