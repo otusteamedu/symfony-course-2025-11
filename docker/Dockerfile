@@ -50,14 +50,15 @@ RUN pecl channel-update pecl.php.net \
     && echo "extension=event.so" > /usr/local/etc/php/conf.d/event.ini
 
 # XDebug
-#RUN apk add --no-cache linux-headers \
-#    && apk add --update --no-cache --virtual .build-dependencies $PHPIZE_DEPS
-#
-#RUN pecl install xdebug
+RUN apk add --no-cache linux-headers \
+    && apk add --update --no-cache --virtual .build-dependencies $PHPIZE_DEPS
+
+#RUN pecl install xdebug \
+#    && docker-php-ext-enable xdebug
 #RUN echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 #RUN echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-#RUN echo "xdebug.trigger_value=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 #RUN echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+#RUN echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 #
 #RUN pecl clear-cache \
 #    && apk del .build-dependencies
