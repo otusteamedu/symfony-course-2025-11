@@ -84,3 +84,24 @@ services:
     App\Application\Security\AuthService:
         arguments:
             $tokenTTL: '%env(JWT_TTL_SEC)%'
+
+    App\Controller\Web\CreateUser\v2\ManagerLoggerDecorator:
+        arguments:
+            $manager: '@App\Controller\Web\CreateUser\v2\Manager'
+
+    App\Controller\Web\CreateUser\v2\ManagerInterface:
+        alias: App\Controller\Web\CreateUser\v2\ManagerLoggerDecorator
+
+    Symfony\Bridge\Monolog\Handler\ElasticsearchLogstashHandler:
+        arguments:
+            - '%env(ELASTICSEARCH_HOST)%'
+            - 'monolog'
+            - '@es_client'
+            - DEBUG
+            - true
+            - 9.2.0
+    App\Infrastructure\Storage\MetricsStorage:
+        arguments:
+            - graphite
+            - 8125
+            - my_app

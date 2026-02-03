@@ -1,0 +1,9 @@
+framework:
+  http_client:
+    default_options:
+      verify_peer: false
+      verify_host: false
+    scoped_clients:
+      es_client:
+        base_uri: '%env(ELASTICSEARCH_HOST)%'
+        auth_basic: '%env(ELASTICSEARCH_USER)%:%env(ELASTICSEARCH_PASSWORD)%'

@@ -11,12 +11,12 @@ use App\Domain\Service\ModelFactory;
 use App\Domain\Service\UserService;
 use App\Domain\ValueObject\CommunicationChannelEnum;
 
-class Manager
+readonly class Manager implements ManagerInterface
 {
     public function __construct(
         /** @var ModelFactory<CreateUserModel> */
-        private readonly ModelFactory $modelFactory,
-        private readonly UserService $userService,
+        private ModelFactory $modelFactory,
+        private UserService $userService,
     ) {
     }
 
