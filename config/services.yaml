@@ -105,3 +105,39 @@ services:
             - graphite
             - 8125
             - my_app
+            -
+    doctrine_memcached_provider:
+        class: Memcached
+        factory: Symfony\Component\Cache\Adapter\MemcachedAdapter::createConnection
+        arguments:
+            - '%env(MEMCACHED_DSN)%'
+            - PREFIX_KEY: 'my_app_doctrine'
+
+    App\Domain\Repository\TweetRepositoryInterface:
+        alias: App\Infrastructure\Repository\TweetRepositoryCacheDecorator
+
+    redis_client:
+        class: Redis
+        factory: Symfony\Component\Cache\Adapter\RedisAdapter::createConnection
+        arguments:
+            - '%env(REDIS_DSN)%'
+
+    redis_adapter:
+        class: Symfony\Component\Cache\Adapter\RedisAdapter
+        arguments:
+            - '@redis_client'
+            - 'my_app'
+
+    App\Application\Symfony\AdapterCountingDecorator:
+        arguments:
+            $adapter: '@redis_adapter'
+
+    App\Infrastructure\Repository\TweetRepositoryCacheDecorator:
+        arguments:
+            $cache: '@redis_tag_aware_adapter'
+
+    redis_tag_aware_adapter:
+        class: Symfony\Component\Cache\Adapter\RedisTagAwareAdapter
+        arguments:
+            - '@redis_client'
+            - 'my_app'

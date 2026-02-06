@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Table(name: 'tweet')]
 #[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Index(name: 'tweet__author_id__ind', columns: ['author_id'])]
 class Tweet implements EntityInterface
 {
@@ -62,6 +63,7 @@ class Tweet implements EntityInterface
         return $this->createdAt;
     }
 
+    #[ORM\PrePersist]
     public function setCreatedAt(): void {
         $this->createdAt = new DateTime();
     }
@@ -70,6 +72,8 @@ class Tweet implements EntityInterface
         return $this->updatedAt;
     }
 
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
     public function setUpdatedAt(): void {
         $this->updatedAt = new DateTime();
     }
