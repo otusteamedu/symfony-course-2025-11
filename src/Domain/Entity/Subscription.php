@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\ApiResource;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'subscription')]
 #[ORM\Entity]
 #[ORM\Index(name: 'subscription__author_id__ind', columns: ['author_id'])]
@@ -69,6 +70,7 @@ class Subscription implements EntityInterface
         return $this->createdAt;
     }
 
+    #[ORM\PrePersist]
     public function setCreatedAt(): void {
         $this->createdAt = new DateTime();
     }
@@ -77,6 +79,8 @@ class Subscription implements EntityInterface
         return $this->updatedAt;
     }
 
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
     public function setUpdatedAt(): void {
         $this->updatedAt = new DateTime();
     }

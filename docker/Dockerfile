@@ -30,6 +30,8 @@ RUN apk update \
         wget \
         bash
 
+RUN echo 'memory_limit = 4096G' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini
+
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
