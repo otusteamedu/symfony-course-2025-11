@@ -1,0 +1,28 @@
+# Read the documentation: https://github.com/FriendsOfSymfony/FOSElasticaBundle/blob/master/doc/setup.md
+fos_elastica:
+    serializer: ~
+    clients:
+        default:
+            hosts: [ '%env(resolve:ELASTICSEARCH_DSN)%' ]
+            client_config:
+                ssl_verify: false
+    indexes:
+        user:
+            persistence:
+                elastica_to_model_transformer:
+                    query_builder_method: createIsActiveQueryBuilder
+                    ignore_missing: true
+                listener:
+                    insert: false
+                    update: true
+                    delete: true
+                driver: orm
+                model: App\Domain\Entity\User
+            serializer:
+                groups: [ elastica ]
+        tweet:
+            persistence:
+                driver: orm
+                model: App\Domain\Entity\Tweet
+            serializer:
+                groups: [ elastica ]

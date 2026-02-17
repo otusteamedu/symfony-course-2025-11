@@ -6,6 +6,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Table(name: 'phone_user')]
 #[ORM\Entity]
@@ -14,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 class PhoneUser extends User
 {
     #[ORM\Column(type: 'string', length: 20, nullable: false)]
+    #[Groups(['elastica'])]
     private string $phone;
 
     public function getPhone(): string
