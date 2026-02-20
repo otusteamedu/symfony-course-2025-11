@@ -54,19 +54,19 @@ RUN pecl channel-update pecl.php.net \
     && echo "extension=memcached.so" > /usr/local/etc/php/conf.d/memcached.ini \
     && echo "extension=event.so" > /usr/local/etc/php/conf.d/event.ini
 
-# XDebug
 RUN apk add --no-cache linux-headers \
     && apk add --update --no-cache --virtual .build-dependencies $PHPIZE_DEPS
 
-#RUN pecl install xdebug \
-#    && docker-php-ext-enable xdebug
-#RUN echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-#RUN echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-#RUN echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-#RUN echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-#
-#RUN pecl clear-cache \
-#    && apk del .build-dependencies
+# XDebug
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+    && echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.start_with_request=no" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+    && echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
+RUN pecl clear-cache \
+    && apk del .build-dependencies
 
 # Symfony installer
 COPY --link \
