@@ -68,6 +68,9 @@ RUN pecl install xdebug \
 RUN pecl clear-cache \
     && apk del .build-dependencies
 
+RUN docker-php-ext-configure pcntl --enable-pcntl \
+        && docker-php-ext-install pcntl
+
 # Symfony installer
 COPY --link \
    --from=ghcr.io/symfony-cli/symfony-cli:latest \
