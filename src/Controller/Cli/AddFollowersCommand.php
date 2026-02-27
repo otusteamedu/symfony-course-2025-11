@@ -62,7 +62,6 @@ final class AddFollowersCommand extends Command
         $progressBar->start();
         for ($i = 1; $i <= $count; $i++) {
             $result += $this->followerService->addFollowersSync($user, $login.$authorId.$i, 1);
-            usleep(200000);
             $progressBar->advance();
         }
         $progressBar->finish();

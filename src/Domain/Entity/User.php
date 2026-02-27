@@ -282,6 +282,14 @@ class User implements EntityInterface, HasMetaTimestampsInterface, SoftDeletable
         return $this->subscriptionFollowers->toArray();
     }
 
+    /**
+     * @return Subscription[]
+     */
+    public function getSubscriptionAuthors(): array
+    {
+        return $this->subscriptionAuthors->toArray();
+    }
+
     public function isProtected(): bool
     {
         return $this->isProtected ?? false;
