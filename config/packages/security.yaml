@@ -21,4 +21,5 @@ security:
             provider: users_in_memory
 
     access_control:
+        - { path: ^/api/doc, roles: ROLE_ADMIN }
         - { path: ^/api/v2/user, roles: ROLE_ADMIN, methods: [POST] }
