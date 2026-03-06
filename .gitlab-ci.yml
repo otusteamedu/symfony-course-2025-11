@@ -15,4 +15,4 @@ deploy_server1:
     - sudo docker compose exec --user root php-fpm composer install --no-interaction
     - sudo docker compose exec --user root php-fpm php bin/console do:mi:mi
   only:
-    - main
+    - master
