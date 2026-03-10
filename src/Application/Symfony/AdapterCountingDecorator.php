@@ -2,11 +2,11 @@
 
 namespace App\Application\Symfony;
 
-use App\Infrastructure\Storage\MetricsStorage;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
+use StatsdBundle\Storage\MetricsStorageInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\CacheItem;
@@ -15,9 +15,12 @@ use Symfony\Contracts\Cache\CacheInterface;
 
 class AdapterCountingDecorator implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
 {
+    public const CACHE_HIT_PREFIX = 'cache.hit.';
+    public const CACHE_MISS_PREFIX = 'cache.miss.';
+
     public function __construct(
         private readonly AbstractAdapter $adapter,
-        private readonly MetricsStorage $metricsStorage,
+        private readonly MetricsStorageInterface $metricsStorage,
     )
     {
         $this->adapter->setCallbackWrapper(null);
@@ -106,9 +109,9 @@ class AdapterCountingDecorator implements AdapterInterface, CacheInterface, Logg
     private function incCounter(CacheItemInterface $cacheItem): void
     {
         if ($cacheItem->isHit()) {
-            $this->metricsStorage->increment(MetricsStorage::CACHE_HIT_PREFIX.$cacheItem->getKey());
+            $this->metricsStorage->increment(self::CACHE_HIT_PREFIX.$cacheItem->getKey());
         } else {
-            $this->metricsStorage->increment(MetricsStorage::CACHE_MISS_PREFIX.$cacheItem->getKey());
+            $this->metricsStorage->increment(self::CACHE_MISS_PREFIX.$cacheItem->getKey());
         }
     }
 }

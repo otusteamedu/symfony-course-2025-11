@@ -414,16 +414,7 @@
     
     namespace App\Application\Symfony;
     
-    use App\Infrastructure\Storage\MetricsStorage;
-    use Psr\Cache\CacheItemInterface;
-    use Psr\Cache\InvalidArgumentException;
-    use Psr\Log\LoggerAwareInterface;
-    use Psr\Log\LoggerInterface;
-    use Symfony\Component\Cache\Adapter\AbstractAdapter;
-    use Symfony\Component\Cache\Adapter\AdapterInterface;
-    use Symfony\Component\Cache\CacheItem;
-    use Symfony\Component\Cache\ResettableInterface;
-    use Symfony\Contracts\Cache\CacheInterface;
+    use Psr\Cache\CacheItemInterface;use Psr\Cache\InvalidArgumentException;use Psr\Log\LoggerAwareInterface;use Psr\Log\LoggerInterface;use StatsdBundle\Storage\MetricsStorage;use Symfony\Component\Cache\Adapter\AbstractAdapter;use Symfony\Component\Cache\Adapter\AdapterInterface;use Symfony\Component\Cache\CacheItem;use Symfony\Component\Cache\ResettableInterface;use Symfony\Contracts\Cache\CacheInterface;
     
     class AdapterCountingDecorator implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
     {
@@ -750,19 +741,13 @@
 14. Выполняем запрос Post tweet из Postman-коллекции v7
 15. Проверяем, что в Redis удалились все ключи, командой `keys *tweets*`
 16. Для работы метрик обновляем класс `src/Infrastructure/Repository/TweetRepositoryCacheDecorator.php`
+
 ```php
 <?php
 
 namespace App\Infrastructure\Repository;
 
-use App\Domain\Entity\Tweet;
-use App\Domain\Model\TweetModel;
-use App\Domain\Repository\TweetRepositoryInterface;
-use App\Infrastructure\Storage\MetricsStorage;
-use Psr\Cache\CacheException;
-use Psr\Cache\InvalidArgumentException;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use App\Domain\Entity\Tweet;use App\Domain\Model\TweetModel;use App\Domain\Repository\TweetRepositoryInterface;use Psr\Cache\CacheException;use Psr\Cache\InvalidArgumentException;use StatsdBundle\Storage\MetricsStorage;use Symfony\Contracts\Cache\ItemInterface;use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 readonly class TweetRepositoryCacheDecorator implements TweetRepositoryInterface
 {

@@ -6,6 +6,9 @@
 parameters:
     baseUrl: 'http://localhost:7777'
     uploadPrefix: '/app/public'
+    statsd.host: '%env(STATSD_HOST)%'
+    statsd.port: '%env(STATSD_PORT)%'
+    statsd.namespace: '%env(STATSD_NAMESPACE)%'
 
 services:
     # default configuration for services in *this* file
@@ -100,12 +103,7 @@ services:
             - DEBUG
             - true
             - 9.2.0
-    App\Infrastructure\Storage\MetricsStorage:
-        arguments:
-            - graphite
-            - 8125
-            - my_app
-            -
+
     doctrine_memcached_provider:
         class: Memcached
         factory: Symfony\Component\Cache\Adapter\MemcachedAdapter::createConnection

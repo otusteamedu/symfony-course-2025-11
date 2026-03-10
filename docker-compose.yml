@@ -2,6 +2,8 @@ services:
 
   php-fpm:
     build: docker
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     container_name: 'php-11'
 #    ports:
 #      - '8000:8000'

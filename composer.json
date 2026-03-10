@@ -14,10 +14,10 @@
         "friendsofsymfony/elastica-bundle": "*",
         "lexik/jwt-authentication-bundle": "^3.2",
         "nelmio/api-doc-bundle": "^5.9",
+        "otusteamedu/statsd-bundle": "^1.0",
         "php-amqplib/rabbitmq-bundle": "^2.19",
         "phpdocumentor/reflection-docblock": "^6.0",
         "phpstan/phpdoc-parser": "^2.3",
-        "slickdeals/statsd": "^3.2",
         "symfony/console": "7.3.*",
         "symfony/dotenv": "7.3.*",
         "symfony/expression-language": "7.3.*",
@@ -91,7 +91,10 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.3.*"
+            "endpoint": [
+                "https://api.github.com/repos/otusteamedu/symfony-recipes/contents/index.json",
+                "flex://defaults"
+            ]
         }
     },
     "require-dev": {
@@ -107,5 +110,11 @@
         "symfony/maker-bundle": "^1.65",
         "symfony/stopwatch": "7.3.*",
         "symfony/web-profiler-bundle": "7.3.*"
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:otusteamedu/statsd-bundle.git"
+        }
+    ]
 }

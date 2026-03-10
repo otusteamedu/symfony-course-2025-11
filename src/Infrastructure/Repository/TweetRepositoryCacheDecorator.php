@@ -5,18 +5,21 @@ namespace App\Infrastructure\Repository;
 use App\Domain\Entity\Tweet;
 use App\Domain\Model\TweetModel;
 use App\Domain\Repository\TweetRepositoryInterface;
-use App\Infrastructure\Storage\MetricsStorage;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
+use StatsdBundle\Storage\MetricsStorageInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 readonly class TweetRepositoryCacheDecorator implements TweetRepositoryInterface
 {
+    public const CACHE_HIT_PREFIX = 'cache.hit.';
+    public const CACHE_MISS_PREFIX = 'cache.miss.';
+
     public function __construct(
         private TweetRepository $tweetRepository,
         private TagAwareCacheInterface $cache,
-        private MetricsStorage $metricsStorage,
+        private MetricsStorageInterface $metricsStorage,
     ) {
     }
 
@@ -60,7 +63,7 @@ readonly class TweetRepositoryCacheDecorator implements TweetRepositoryInterface
             }, null, $metadata
         );
 
-        $metric = [] !== $metadata ? MetricsStorage::CACHE_HIT_PREFIX : MetricsStorage::CACHE_MISS_PREFIX;
+        $metric = [] !== $metadata ? self::CACHE_HIT_PREFIX : self::CACHE_MISS_PREFIX;
         $this->metricsStorage->increment($metric . $cacheKey);
 
         return $results;
