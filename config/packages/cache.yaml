@@ -6,6 +6,6 @@ framework:
             doctrine.result_cache_pool:
                 adapter: cache.adapter.memcached
                 provider: doctrine_memcached_provider
-            doctrine.system_cache_pool:
+            doctrine.metadata_cache_pool:
                 adapter: cache.adapter.memcached
                 provider: doctrine_memcached_provider
