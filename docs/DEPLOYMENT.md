@@ -164,13 +164,41 @@
      POSTGRES_USER=prod
      POSTGRES_PASSWORD=prod
      ```
-11. Создаём файл `.env.test` — копию файла `.env` проекта в директории `/app/deploy/releases/shared/`
-12. Меняем в файле `DATABASE_URL` и **удаляем переменные** `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`:
+11. Добавляем простой action-healthcheck. Создаём класс `App\Controller\Web\Healthcheck\Controller`:
+   ```php
+   <?php
+   
+   namespace App\Controller\Web\Healthcheck;
+   
+   use Symfony\Component\HttpFoundation\JsonResponse;
+   use Symfony\Component\HttpFoundation\Response;
+   use Symfony\Component\HttpKernel\Attribute\AsController;
+   use Symfony\Component\Routing\Attribute\Route;
+   
+   #[AsController]
+   class Controller
+   {
+       #[Route(path: '/healthcheck', name: 'healthcheck')]
+       public function __invoke(): Response
+       {
+           return new JsonResponse(['ok']);
+       }
+   }
+   ```
+12. Исправляем секцию `access_control` в `config/packages/security.yaml`:
+   ```yaml
+       access_control:
+           - { path: ^/healthcheck, roles: PUBLIC_ACCESS }
+           - { path: ^/api/doc, roles: ROLE_ADMIN }
+           - { path: ^/api/v2/user, roles: ROLE_ADMIN, methods: [POST] }
+   ```
+13. Создаём файл `.env.test` — копию файла `.env` проекта в директории `/app/deploy/releases/shared/`
+14. Меняем в файле `DATABASE_URL` и **удаляем переменные** `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`:
      ```shell
      APP_ENV=test
      DATABASE_URL=postgresql://testing:testing@test_postgres:5432/testing?serverVersion=17&charset=utf8
      ```
-13. **Внимание! Для корректной сборки (компиляции) кэша для prod-окружения нужно исправить `config/packages/cache.yaml` и `config/packages/doctrine.yaml`** - без этого проект не поднимется.
+15. **Внимание! Для корректной сборки (компиляции) кэша для prod-окружения нужно исправить `config/packages/cache.yaml` и `config/packages/doctrine.yaml`** - без этого проект не поднимется.
    ```yaml
    ## cache.yaml
    framework:
@@ -290,7 +318,7 @@
     backend blue_green
       mode http
     
-      option httpchk GET /
+      option httpchk GET /healthcheck
       http-check expect status 200
     
       balance          roundrobin
