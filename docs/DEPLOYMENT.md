@@ -408,6 +408,7 @@
         blue_supervisor:
             build: docker/supervisor
             container_name: blue_supervisor
+            command: ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
             restart: unless-stopped
             volumes:
                 - ./releases/blue:/app:delegated
@@ -423,6 +424,7 @@
         green_supervisor:
             build: docker/supervisor
             container_name: green_supervisor
+            command: ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
             restart: unless-stopped
             volumes:
                 - ./releases/green:/app:delegated
@@ -815,9 +817,10 @@
             - bash ./scripts/deploy.sh
         when: manual
     ```
-5. Переходим в директорию `/app/deploy` и запускаем инфраструктурные контейнеры
+5. Переходим в директорию `/app/deploy`, запускаем инфраструктурные контейнеры и включаем плагин x-consisten-hash для RabbitMQ
     ```shell
     sudo docker compose up postgres redis memcached rabbitmq elasticsearch kibana graphite grafana gateway -d
+    sudo docker exec rabbitmq rabbitmq-plugins enable rabbitmq_consistent_hash_exchange
     ```
 6. Пушим код в ветку `master`. Видим в `Build -> Pipelines`, что пайплайн запустился. Пробуем запустить `deploy`
 
