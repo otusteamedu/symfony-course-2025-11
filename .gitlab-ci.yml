@@ -1,19 +1,18 @@
 stages:
-  - build
+  - test
+  - deploy
 
-deploy_server1:
-  stage: build
+tests:
+  stage: test
   script:
-    - echo $DEPLOY_DIR
     - cd $DEPLOY_DIR
-    - '[ -d "deploy" ] && sudo docker compose -f deploy/docker-compose.yml down --remove-orphans && sudo rm -rf ./deploy'
-    - git clone http://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_FQDN}/${CI_PROJECT_PATH} deploy
-    - sudo chown 1000:1000 ./deploy -R
-    - cd deploy
-    - sudo docker compose up -d
-    - sudo docker ps
-    - sudo docker compose exec --user root php-fpm composer install --no-interaction
-    - sudo docker compose exec --user root php-fpm php bin/console do:mi:mi
-    - sudo docker compose exec --user root php-fpm php vendor/bin/codecept run Unit
+    - bash ./scripts/test.sh
   only:
     - master
+
+deploy:
+  stage: deploy
+  script:
+    - cd $DEPLOY_DIR
+    - bash ./scripts/deploy.sh
+  when: manual
