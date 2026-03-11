@@ -170,7 +170,7 @@
      APP_ENV=test
      DATABASE_URL=postgresql://testing:testing@test_postgres:5432/testing?serverVersion=17&charset=utf8
      ```
-13. **Внимание! Для корректной сборки (компиляции) кэша для prod-окружения нужно исправить `config/packages/cache.yaml` и `config/packages/doctrine.yaml`**
+13. **Внимание! Для корректной сборки (компиляции) кэша для prod-окружения нужно исправить `config/packages/cache.yaml` и `config/packages/doctrine.yaml`** - без этого проект не поднимется.
    ```yaml
    ## cache.yaml
    framework:
@@ -186,7 +186,54 @@
                    provider: doctrine_memcached_provider
    ```
    ```yaml
-  ## doctrine.yaml
+   ## doctrine.yaml
+   doctrine:
+       dbal:
+           url: '%env(resolve:DATABASE_URL)%'
+   
+           profiling_collect_backtrace: '%kernel.debug%'
+           use_savepoints: true
+           types:
+               communicationChannel: App\Application\Doctrine\Types\CommunicationChannelType
+       orm:
+           metadata_cache_driver:
+               type: pool
+               pool: doctrine.metadata_cache_pool
+           query_cache_driver:
+               type: pool
+               pool: doctrine.metadata_cache_pool
+           result_cache_driver:
+               type: pool
+               pool: doctrine.result_cache_pool
+           auto_generate_proxy_classes: true
+           enable_lazy_ghost_objects: true
+           report_fields_where_declared: true
+           validate_xml_mapping: true
+           naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+           identity_generation_preferences:
+               Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
+           auto_mapping: true
+           mappings:
+               App:
+                   type: attribute
+                   is_bundle: false
+                   dir: '%kernel.project_dir%/src/Domain/Entity'
+                   prefix: 'App\Domain\Entity'
+                   alias: App
+           controller_resolver:
+               auto_mapping: false
+           filters:
+               soft_delete_filter:
+                   class: App\Application\Doctrine\SoftDeletedFilter
+                   enabled: true
+                   parameters:
+                       checkTime: true
+   
+   when@test:
+       doctrine:
+           dbal:
+               dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+   
    when@prod:
        doctrine:
            orm:
@@ -198,7 +245,16 @@
                result_cache_driver:
                    type: pool
                    pool: doctrine.result_cache_pool
-```
+   
+       framework:
+           cache:
+               pools:
+                   doctrine.result_cache_pool:
+                       adapter: cache.app
+                   doctrine.system_cache_pool:
+                       adapter: cache.system
+   
+   ```
 ## Добавляем конфиг `haproxy`
 1. Создаём директорию `/app/deploy/haproxy`
     ```shell
