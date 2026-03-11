@@ -5,7 +5,7 @@ framework:
         pools:
             doctrine.result_cache_pool:
                 adapter: cache.adapter.memcached
-                provider: doctrine_memcached_provider
+                provider: '%env(MEMCACHED_DSN)%'
             doctrine.metadata_cache_pool:
                 adapter: cache.adapter.memcached
-                provider: doctrine_memcached_provider
+                provider: '%env(MEMCACHED_DSN)%'
