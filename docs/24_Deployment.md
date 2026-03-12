@@ -82,8 +82,8 @@
     ```
 7. Выходим из контейнера
 8. Заходим в браузере по адресу `http://SERVER_URL_OR_HOST:7778`
-    1. логинимся с логином `root` и указанным паролем
-    2. Создаём группу и публичный репозиторий в ней
+   1. логинимся с логином `root` и указанным паролем
+   2. Создаём группу и публичный репозиторий в ней
 9. **В ВМ** выполняем команды по одной
     ```shell
     curl -s https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh | sudo bash
@@ -419,7 +419,8 @@
                 - blue
                 - rabbitmq
             networks:
-                - main
+                main:
+                    ipv4_address: 172.20.0.201
 
         green_supervisor:
             build: docker/supervisor
@@ -435,7 +436,8 @@
                 - green
                 - rabbitmq
             networks:
-                - main
+                main:
+                    ipv4_address: 172.20.0.202
 
         test:
             build: docker
@@ -477,21 +479,24 @@
             volumes:
                 - ./postgres_data:/var/lib/postgresql/data
             networks:
-                - main
+                main:
+                    ipv4_address: 172.20.0.203
 
         redis:
             image: redis:alpine
             container_name: redis
             restart: always
             networks:
-                - main
+                main:
+                    ipv4_address: 172.20.0.204
 
         memcached:
             image: memcached:latest
             container_name: memcached
             restart: always
             networks:
-                - main
+                main:
+                    ipv4_address: 172.20.0.205
 
         rabbitmq:
             image: rabbitmq:3-management
@@ -504,7 +509,8 @@
             ports:
                 - '15672:15672'
             networks:
-                - main
+                main:
+                    ipv4_address: 172.20.0.206
 
         elasticsearch:
             image: elasticsearch:9.2.0
@@ -521,7 +527,8 @@
                     soft: -1
                     hard: -1
             networks:
-                - main
+                main:
+                    ipv4_address: 172.20.0.207
 
         kibana:
             image: kibana:9.2.0
@@ -532,7 +539,8 @@
             ports:
                 - '5601:5601'
             networks:
-                - main
+                main:
+                    ipv4_address: 172.20.0.208
 
         graphite:
             image: graphiteapp/graphite-statsd
@@ -543,7 +551,8 @@
                 - '2003:2003'
                 - '8125:8125/udp'
             networks:
-                - main
+                main:
+                    ipv4_address: 172.20.0.209
 
         grafana:
             image: grafana/grafana
@@ -552,7 +561,8 @@
             ports:
                 - '3000:3000'
             networks:
-                - main
+                main:
+                    ipv4_address: 172.20.0.210
 
     networks:
         main:
@@ -573,18 +583,54 @@
     nodaemon=true
     logfile=/var/log/supervisord.log
 
-    [program:messenger-consumer]
-    command=php /app/bin/console messenger:consume async --time-limit=3600 --memory-limit=128M
+    [program:consumer-add-followers]
+    command=php /app/bin/console rabbitmq:consumer add_followers
     autostart=true
     autorestart=true
-    numprocs=2
-    process_name=%(program_name)s_%(process_num)02d
+    stdout_logfile=/dev/stdout
+    stdout_logfile_maxbytes=0
+    stderr_logfile=/dev/stderr
+    stderr_logfile_maxbytes=0
+
+    [program:consumer-publish-tweet]
+    command=php /app/bin/console rabbitmq:consumer publish_tweet
+    autostart=true
+    autorestart=true
+    stdout_logfile=/dev/stdout
+    stdout_logfile_maxbytes=0
+    stderr_logfile=/dev/stderr
+    stderr_logfile_maxbytes=0
+
+    [program:consumer-send-notification-email]
+    command=php /app/bin/console rabbitmq:consumer send_notification.email
+    autostart=true
+    autorestart=true
+    stdout_logfile=/dev/stdout
+    stdout_logfile_maxbytes=0
+    stderr_logfile=/dev/stderr
+    stderr_logfile_maxbytes=0
+
+    [program:consumer-send-notification-sms]
+    command=php /app/bin/console rabbitmq:consumer send_notification.sms
+    autostart=true
+    autorestart=true
+    stdout_logfile=/dev/stdout
+    stdout_logfile_maxbytes=0
+    stderr_logfile=/dev/stderr
+    stderr_logfile_maxbytes=0
+
+    [program:consumer-update-feed]
+    command=php /app/bin/console rabbitmq:consumer update_feed_%(process_num)d
+    autostart=true
+    autorestart=true
+    numprocs=10
+    process_name=%(program_name)s_%(process_num)d
     stdout_logfile=/dev/stdout
     stdout_logfile_maxbytes=0
     stderr_logfile=/dev/stderr
     stderr_logfile_maxbytes=0
     ```
-   **Настройте `command`, `numprocs` и транспорт (`async`) под ваш проект**
+   **Настройте консьюмеры под ваш проект**
 
 ## Добавляем скрипты деплоев
 
@@ -817,7 +863,7 @@
             - bash ./scripts/deploy.sh
         when: manual
     ```
-5. Переходим в директорию `/app/deploy`, запускаем инфраструктурные контейнеры и включаем плагин x-consisten-hash для RabbitMQ
+5. Переходим в директорию `/app/deploy`, запускаем инфраструктурные контейнеры и включаем плагин `x-consistent-hash` для RabbitMQ
     ```shell
     sudo docker compose up postgres redis memcached rabbitmq elasticsearch kibana graphite grafana gateway -d
     sudo docker exec rabbitmq rabbitmq-plugins enable rabbitmq_consistent_hash_exchange
