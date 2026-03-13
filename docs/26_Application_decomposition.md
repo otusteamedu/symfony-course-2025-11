@@ -76,7 +76,9 @@
     
     namespace FeedBundle\Infrastructure\Repository;
     
-    use App\Domain\Entity\User;use FeedBundle\Domain\Entity\Feed;use FeedBundle\Domain\Model\TweetModel;
+    use App\Domain\Entity\User;
+    use FeedBundle\Domain\Entity\Feed;
+    use FeedBundle\Domain\Model\TweetModel;
     
     class FeedRepository extends AbstractRepository
     {
@@ -456,7 +458,8 @@
     
     namespace FeedBundle\Infrastructure\Repository;
     
-    use FeedBundle\Domain\Entity\Feed;use FeedBundle\Domain\Model\TweetModel;
+    use FeedBundle\Domain\Entity\Feed;
+    use FeedBundle\Domain\Model\TweetModel;
     
     class FeedRepository extends AbstractRepository
     {
