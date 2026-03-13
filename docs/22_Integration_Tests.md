@@ -366,17 +366,7 @@
     
     namespace App\Domain\Service;
     
-    use App\Domain\Bus\PublishTweetBusInterface;
-    use App\Domain\Bus\SendNotificationBusInterface;
-    use App\Domain\DTO\SendNotificationDTO;
-    use App\Domain\Entity\EmailUser;
-    use App\Domain\Entity\Subscription;
-    use App\Domain\Entity\Tweet;
-    use App\Domain\Entity\User;
-    use App\Domain\Model\TweetModel;
-    use App\Domain\ValueObject\CommunicationChannelEnum;
-    use App\Infrastructure\Repository\FeedRepository;
-    use App\Infrastructure\Repository\TweetRepository;
+    use App\Domain\Bus\PublishTweetBusInterface;use App\Domain\Entity\EmailUser;use App\Domain\Entity\Subscription;use App\Domain\Entity\Tweet;use App\Domain\Entity\User;use App\Domain\Model\TweetModel;use App\Domain\ValueObject\CommunicationChannelEnum;use App\Infrastructure\Repository\FeedRepository;use App\Infrastructure\Repository\TweetRepository;use FeedBundle\Domain\Bus\SendNotificationBusInterface;use FeedBundle\Domain\DTO\SendNotificationDTO;
     
     class FeedService
     {
@@ -483,12 +473,7 @@
     
     namespace FunctionalTests\Service;
     
-    use App\Domain\Entity\PhoneUser;
-    use App\Domain\Entity\Subscription;
-    use App\Domain\Entity\Tweet;
-    use App\Domain\Service\FeedService;
-    use App\Tests\Support\FunctionalTester;
-    use Codeception\Example;
+    use App\Domain\Entity\PhoneUser;use App\Domain\Entity\Subscription;use App\Domain\Entity\Tweet;use App\Tests\Support\FunctionalTester;use Codeception\Example;use FeedBundle\Domain\Service\FeedService;
     
     class FeedServiceCest
     {

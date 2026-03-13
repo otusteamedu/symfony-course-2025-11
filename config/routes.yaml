@@ -3,3 +3,9 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+server_api:
+    resource:
+        path: ../feedBundle/src/Controller/
+        namespace: FeedBundle\Controller
+    type: attribute

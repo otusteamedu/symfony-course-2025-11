@@ -13,6 +13,7 @@ class UpdateFeedDTO
         public readonly string $text,
         public readonly DateTime $createdAt,
         public readonly int $followerId,
+        public readonly string $followerChannel
     ) {
     }
 }
