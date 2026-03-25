@@ -25,12 +25,17 @@ class FeedService
 
     public function materializeTweet(TweetModel $tweet, int $followerId, string $channel): void
     {
-        $this->feedRepository->putTweetToReaderFeed($tweet, $followerId);
-        $sendNotificationDTO = new SendNotificationDTO(
-            $followerId,
-            $tweet->text,
-            $channel
+        $this->feedRepository->transactional(
+            function () use ($tweet, $followerId, $channel) {
+                $this->feedRepository->putTweetToReaderFeed($tweet, $followerId);
+
+                $sendNotificationDTO = new SendNotificationDTO(
+                    $followerId,
+                    $tweet->text,
+                    $channel
+                );
+                $this->sendNotificationBus->sendNotification($sendNotificationDTO);
+            },
         );
-        $this->sendNotificationBus->sendNotification($sendNotificationDTO);
     }
 }

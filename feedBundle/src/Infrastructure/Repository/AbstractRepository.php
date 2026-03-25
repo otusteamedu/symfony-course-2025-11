@@ -39,4 +39,16 @@ abstract class AbstractRepository
     {
         $this->entityManager->refresh($entity);
     }
+
+    public function transactional(callable $callable): void
+    {
+        try {
+            $this->entityManager->getConnection()->beginTransaction();
+            $callable();
+            $this->entityManager->getConnection()->commit();
+        } catch (\Throwable $e) {
+            $this->entityManager->getConnection()->rollBack();
+            throw $e;
+        }
+    }
 }

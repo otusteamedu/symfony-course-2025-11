@@ -26,6 +26,8 @@ RUN apk update \
         postgresql-dev \
         linux-headers \
         libmemcached-dev \
+        rabbitmq-c \
+        rabbitmq-c-dev \
         curl \
         wget \
         bash
@@ -41,18 +43,23 @@ RUN docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) \
     intl \
     gd \
     bcmath \
+    pcntl \
     pdo_pgsql \
     sockets \
     zip
 RUN pecl channel-update pecl.php.net \
     && pecl install -o -f \
-        redis \
-        event \
+        amqp \
         memcached \
+        redis \
+        memcached \
+        event \
     && rm -rf /tmp/pear \
+    && echo "extension=amqp.so" > /usr/local/etc/php/conf.d/amqp.ini \
     && echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini \
-    && echo "extension=memcached.so" > /usr/local/etc/php/conf.d/memcached.ini \
-    && echo "extension=event.so" > /usr/local/etc/php/conf.d/event.ini
+    && echo "extension=event.so" > /usr/local/etc/php/conf.d/event.ini \
+    && echo "extension=memcached.so" > /usr/local/etc/php/conf.d/memcached.ini
+
 
 RUN apk add --no-cache linux-headers \
     && apk add --update --no-cache --virtual .build-dependencies $PHPIZE_DEPS
