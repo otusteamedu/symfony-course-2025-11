@@ -26,11 +26,11 @@ RUN apk update \
         postgresql-dev \
         linux-headers \
         libmemcached-dev \
+        rabbitmq-c \
+        rabbitmq-c-dev \
         curl \
         wget \
         bash
-
-RUN echo 'memory_limit = 4096M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
@@ -41,37 +41,18 @@ RUN docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) \
     intl \
     gd \
     bcmath \
+    pcntl \
     pdo_pgsql \
     sockets \
     zip
 RUN pecl channel-update pecl.php.net \
     && pecl install -o -f \
+        amqp \
+        memcached \
         redis \
         event \
-        memcached \
     && rm -rf /tmp/pear \
+    && echo "extension=amqp.so" > /usr/local/etc/php/conf.d/amqp.ini \
     && echo "extension=redis.so" > /usr/local/etc/php/conf.d/redis.ini \
-    && echo "extension=memcached.so" > /usr/local/etc/php/conf.d/memcached.ini \
-    && echo "extension=event.so" > /usr/local/etc/php/conf.d/event.ini
-
-RUN apk add --no-cache linux-headers \
-    && apk add --update --no-cache --virtual .build-dependencies $PHPIZE_DEPS
-
-# XDebug
-RUN pecl install xdebug \
-    && docker-php-ext-enable xdebug \
-    && echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.client_port=9003" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-
-RUN pecl clear-cache \
-    && apk del .build-dependencies
-
-RUN docker-php-ext-configure pcntl --enable-pcntl \
-        && docker-php-ext-install pcntl
-
-# Symfony installer
-COPY --link \
-   --from=ghcr.io/symfony-cli/symfony-cli:latest \
-   /usr/local/bin/symfony /usr/local/bin/symfony
+    && echo "extension=event.so" > /usr/local/etc/php/conf.d/event.ini \
+    && echo "extension=memcached.so" > /usr/local/etc/php/conf.d/memcached.ini
